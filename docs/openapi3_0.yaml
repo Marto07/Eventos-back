@@ -1,0 +1,1040 @@
+openapi: 3.0.0
+info:
+  title: API de Eventos
+  description: Esta es la API para la gestión de Eventos con todos apartados y personalizaciones que eso conlleva\:Creacion de usuarios, creacion de eventos, lista de invitados, privacidad del evento, envio de invitacion por mail, seleccion de ticket.
+  version: 1.0.0
+paths:
+  /api/tickets:
+    get:
+      summary: Obtener todos los tickets
+      description: Devuelve una lista de todos los tickets.
+      tags:
+        - Tickets
+      responses:
+        '200':
+          description: Lista de tickets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: ID del ticket
+                    fondo_color:
+                      type: string
+                      description: Color de fondo del ticket
+                    letras_color:
+                      type: string
+                      description: Color de las letras del ticket
+                    created_at:
+                      type: string
+                      format: date-time
+                      description: Fecha de creación
+                    updated_at:
+                      type: string
+                      format: date-time
+                      description: Fecha de actualización
+    post:
+      summary: Crear un nuevo ticket
+      description: Crea un nuevo ticket con los datos proporcionados.
+      tags:
+        - Tickets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fondo_color:
+                  type: string
+                  description: Color de fondo del ticket
+                  example: "#FFFFFF"
+                letras_color:
+                  type: string
+                  description: Color de las letras del ticket
+                  example: "#000000"
+      responses:
+        '201':
+          description: Ticket creado exitosamente
+        '422':
+          description: Error de validación
+
+  /api/tickets/{id}:
+    get:
+      summary: Consultar un ticket específico
+      description: Obtiene los detalles de un ticket específico.
+      tags:
+        - Tickets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del ticket
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalles del ticket
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  fondo_color:
+                    type: string
+                  letras_color:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: Ticket no encontrado
+    put:
+      summary: "Actualizar un ticket existente"
+      description: "Actualiza todos los campos de un ticket específico."
+      tags:
+        - Tickets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID del ticket a actualizar"
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fondo_color:
+                  type: string
+                  description: "Color de fondo del ticket"
+                  example: "#FFFFFF"
+                letras_color:
+                  type: string
+                  description: "Color de las letras del ticket"
+                  example: "#000000"
+              required:
+                - fondo_color
+                - letras_color
+      responses:
+        200:
+          description: "Ticket actualizado exitosamente"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "ticket actualizado"
+                  ticket:
+                    $ref: "#/components/schemas/Ticket"
+                  status:
+                    type: integer
+                    example: 200
+        400:
+          description: "Error en la validación de los datos"
+        404:
+          description: "Ticket no encontrado"
+    patch:
+      summary: "Actualizar parcialmente un ticket"
+      description: "Actualiza uno o más campos de un ticket específico."
+      tags:
+        - Tickets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID del ticket a actualizar parcialmente"
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fondo_color:
+                  type: string
+                  description: "Color de fondo del ticket"
+                  example: "#FFFFFF"
+                letras_color:
+                  type: string
+                  description: "Color de las letras del ticket"
+                  example: "#000000"
+      responses:
+        200:
+          description: "Ticket actualizado parcialmente"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Ticket actualizado"
+                  ticket:
+                    $ref: "#/components/schemas/Ticket"
+                  status:
+                    type: integer
+                    example: 200
+        400:
+          description: "Error en la validación de los datos"
+        404:
+          description: "Ticket no encontrado"
+    delete:
+      summary: "Eliminar un ticket"
+      description: "Elimina un ticket identificado por su ID."
+      tags:
+        - Tickets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID del ticket a eliminar"
+          schema:
+            type: integer
+      responses:
+        200:
+          description: "Ticket eliminado exitosamente"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "ticket eliminado"
+                  status:
+                    type: integer
+                    example: 200
+        404:
+          description: "Ticket no encontrado"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "ticket no encontrado"
+                  status:
+                    type: integer
+                    example: 404
+
+  
+  
+  /api/usuarios:
+    get:
+      tags:
+        - Usuarios
+      summary: Obtener todos los usuarios
+      description: Devuelve una lista con todos los usuarios registrados.
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: ID del usuario
+                    nombre:
+                      type: string
+                      description: Nombre del usuario
+                    apellido:
+                      type: string
+                      description: Apellido del usuario
+                    email:
+                      type: string
+                      description: Email del usuario
+                    nombre_usuario:
+                      type: string
+                      description: Nombre de usuario
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+
+    post:
+      tags:
+        - Usuarios
+      summary: Crear un nuevo usuario
+      description: Crea un nuevo usuario con los datos proporcionados.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  description: Nombre del usuario
+                apellido:
+                  type: string
+                  description: Apellido del usuario
+                email:
+                  type: string
+                  description: Email único del usuario
+                nombre_usuario:
+                  type: string
+                  description: Nombre de usuario
+                contrasena:
+                  type: string
+                  description: Contraseña del usuario
+              required:
+                - nombre
+                - apellido
+                - email
+                - nombre_usuario
+                - contrasena
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+        '422':
+          description: Error de validación
+
+  /api/usuarios/{id}:
+    get:
+      tags:
+        - Usuarios
+      summary: Consultar un usuario específico
+      description: Obtiene los detalles de un usuario identificado por su ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del usuario
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalles del usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  nombre:
+                    type: string
+                  apellido:
+                    type: string
+                  email:
+                    type: string
+                  nombre_usuario:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: Usuario no encontrado
+
+    put:
+      tags:
+        - Usuarios
+      summary: Actualizar un usuario
+      description: Actualiza todos los datos de un usuario existente.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del usuario
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                apellido:
+                  type: string
+                email:
+                  type: string
+                nombre_usuario:
+                  type: string
+                contrasena:
+                  type: string
+              required:
+                - nombre
+                - apellido
+                - email
+                - nombre_usuario
+                - contrasena
+      responses:
+        '200':
+          description: Usuario actualizado correctamente
+        '404':
+          description: Usuario no encontrado
+
+    patch:
+      tags:
+        - Usuarios
+      summary: Actualizar parcialmente un usuario
+      description: Actualiza parcialmente los datos de un usuario.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del usuario
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                apellido:
+                  type: string
+                email:
+                  type: string
+                nombre_usuario:
+                  type: string
+                contrasena:
+                  type: string
+      responses:
+        '200':
+          description: Usuario actualizado parcialmente
+        '404':
+          description: Usuario no encontrado
+
+
+
+
+
+    delete:
+      tags:
+        - Usuarios
+      summary: Eliminar un usuario
+      description: Elimina un usuario por su ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del usuario
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuario eliminado correctamente
+        '404':
+          description: Usuario no encontrado
+  /eventos:
+    get:
+      tags:
+        - Eventos
+      summary: Listar todos los eventos
+      description: Obtiene una lista de todos los eventos.
+      responses:
+        200:
+          description: Lista de eventos obtenida con éxito
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Evento'
+
+    post:
+      tags:
+        - Eventos
+      summary: Crear un evento
+      description: Crea un nuevo evento.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Evento'
+      responses:
+        201:
+          description: Evento creado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+        400:
+          description: Error en la validación de los datos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /eventos/{id}:
+    get:
+      tags:
+        - Eventos
+      summary: Obtener un evento
+      description: Obtiene un evento específico por su ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del evento a obtener
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Evento obtenido con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+        404:
+          description: Evento no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      tags:
+        - Eventos
+      summary: Actualizar un evento
+      description: Actualiza un evento existente por su ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del evento a actualizar
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Evento'
+      responses:
+        200:
+          description: Evento actualizado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+        400:
+          description: Error en la validación de los datos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Evento no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      tags:
+        - Eventos
+      summary: Actualización parcial de un evento
+      description: Actualiza parcialmente un evento existente por su ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del evento a actualizar parcialmente
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventoParcial'
+      responses:
+        200:
+          description: Evento actualizado parcialmente con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+        400:
+          description: Error en la validación de los datos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Evento no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - Eventos
+      summary: Eliminar un evento
+      description: Elimina un evento existente por su ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del evento a eliminar
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Evento eliminado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        404:
+          description: Evento no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /invitados:
+    get:
+      summary: Obtener todos los invitados
+      operationId: getInvitados
+      tags:
+        - Invitados
+      responses:
+        '200':
+          description: Lista de invitados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Invitado'
+    post:
+      summary: Crear un nuevo invitado
+      operationId: createInvitado
+      tags:
+        - Invitados
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitadoRequest'
+      responses:
+        '201':
+          description: Invitado creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invitado'
+        '400':
+          description: Error en la validación de los datos
+        '500':
+          description: Error al crear el invitado
+  /invitados/{id}:
+    get:
+      summary: Obtener un invitado por ID
+      operationId: getInvitadoById
+      tags:
+        - Invitados
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del invitado
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Invitado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invitado'
+        '404':
+          description: Invitado no encontrado
+    put:
+      summary: Actualizar un invitado
+      operationId: updateInvitado
+      tags:
+        - Invitados
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del invitado a actualizar
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitadoRequest'
+      responses:
+        '200':
+          description: Invitado actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invitado'
+        '400':
+          description: Error en la validación de los datos
+        '404':
+          description: Invitado no encontrado
+    delete:
+      summary: Eliminar un invitado
+      operationId: deleteInvitado
+      tags:
+        - Invitados
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del invitado a eliminar
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Invitado eliminado exitosamente
+        '404':
+          description: Invitado no encontrado
+  /invitados/{id}/partial-update:
+    patch:
+      summary: Actualizar parcialmente un invitado
+      operationId: partialUpdateInvitado
+      tags:
+        - Invitados
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del invitado a actualizar parcialmente
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitadoRequest'
+      responses:
+        '200':
+          description: Invitado actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invitado'
+        '400':
+          description: Error en la validación de los datos
+        '404':
+          description: Invitado no encontrado
+  /requisitos:
+    get:
+      tags:
+        - Requisitos
+      summary: Obtener todos los requisitos
+      description: Devuelve una lista de todos los requisitos.
+      responses:
+        '200':
+          description: Lista de requisitos devuelta con éxito.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Requisito'
+    post:
+      tags:
+        - Requisitos
+      summary: Crear un nuevo requisito
+      description: Crea un requisito con los datos proporcionados.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequisitoInput'
+      responses:
+        '201':
+          description: Requisito creado con éxito.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisito'
+        '400':
+          description: Error en la validación de los datos.
+        '500':
+          description: Error al crear el requisito.
+
+  /requisitos/{id}:
+    get:
+      tags:
+        - Requisitos
+      summary: Obtener un requisito
+      description: Devuelve la información de un requisito específico.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Requisito encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisito'
+        '404':
+          description: Requisito no encontrado.
+
+    put:
+      tags:
+        - Requisitos
+      summary: Actualizar un requisito
+      description: Actualiza toda la información de un requisito existente.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequisitoInput'
+      responses:
+        '200':
+          description: Requisito actualizado con éxito.
+        '400':
+          description: Error en la validación de los datos.
+        '404':
+          description: Requisito no encontrado.
+
+    patch:
+      tags:
+        - Requisitos
+      summary: Actualización parcial de un requisito
+      description: Actualiza parcialmente la información de un requisito.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequisitoPartialInput'
+      responses:
+        '200':
+          description: Requisito actualizado con éxito.
+        '400':
+          description: Error en la validación de los datos.
+        '404':
+          description: Requisito no encontrado.
+
+    delete:
+      tags:
+        - Requisitos
+      summary: Eliminar un requisito
+      description: Elimina un requisito específico.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Requisito eliminado con éxito.
+        '404':
+          description: Requisito no encontrado.
+  /tiporequisito:
+    get:
+      tags:
+        - TipoRequisitos
+      summary: Obtener todos los tipos de requisitos
+      description: Devuelve una lista de todos los tipos de requisitos existentes.
+      responses:
+        '200':
+          description: Lista de tipos de requisitos.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TipoRequisito'
+    post:
+      tags:
+        - TipoRequisitos
+      summary: Crear un nuevo tipo de requisito
+      description: Guarda un nuevo tipo de requisito en la base de datos.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TipoRequisitoInput'
+      responses:
+        '201':
+          description: Tipo de requisito creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoRequisitoResponse'
+        '400':
+          description: Error de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /tiporequisito/{id}:
+    get:
+      tags:
+        - TipoRequisitos
+      summary: Obtener un tipo de requisito
+      description: Devuelve los detalles de un tipo de requisito específico.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalles del tipo de requisito.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoRequisitoResponse'
+        '404':
+          description: Tipo de requisito no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - TipoRequisitos
+      summary: Actualizar un tipo de requisito
+      description: Actualiza los datos de un tipo de requisito específico.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TipoRequisitoInput'
+      responses:
+        '200':
+          description: Tipo de requisito actualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoRequisitoResponse'
+        '400':
+          description: Error de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Tipo de requisito no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags:
+        - TipoRequisitos
+      summary: Actualización parcial de un tipo de requisito
+      description: Actualiza ciertos campos de un tipo de requisito.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TipoRequisitoInputPartial'
+      responses:
+        '200':
+          description: Tipo de requisito actualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoRequisitoResponse'
+        '400':
+          description: Error de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Tipo de requisito no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - TipoRequisitos
+      summary: Eliminar un tipo de requisito
+      description: Elimina un tipo de requisito de la base de datos.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tipo de requisito eliminado.
+        '404':
+          description: Tipo de requisito no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+

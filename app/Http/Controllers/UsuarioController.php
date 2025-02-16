@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 
 class UsuarioController extends Controller
 {
@@ -43,7 +44,7 @@ class UsuarioController extends Controller
             'apellido'              => $request->apellido,
             'email'                 => $request->email,
             'nombre_usuario'        => $request->nombre_usuario,
-            'contrasena'            => $request->contrasena,
+            'contrasena'            => Hash::make($request->contrasena),
         ]);
 
         if (!$usuario) {
@@ -118,11 +119,11 @@ class UsuarioController extends Controller
             return response()->json($data, 400);
         }
 
-        $usuario->nombre      = $request->nombre;
-        $usuario->apellido     = $request->apellido;
-        $usuario->email     = $request->email;
-        $usuario->nombre_usuario  = $request->nombre_usuario;
-        $usuario->contrasena  = $request->contrasena;
+        $usuario->nombre            = $request->nombre;
+        $usuario->apellido          = $request->apellido;
+        $usuario->email             = $request->email;
+        $usuario->nombre_usuario    = $request->nombre_usuario;
+        $usuario->contrasena        = Hash::make($request->contrasena);
 
         $usuario->save();
 
@@ -219,5 +220,35 @@ class UsuarioController extends Controller
         ];
 
         return response()->json($data, 200);
+    }
+
+    public function authenticate(Request $request)
+    {
+        // Validar los datos del formulario
+        $request->validate([
+            'email'     => 'required|email',
+            'contrasena'  => 'required|min:8|max:255'
+        ]);
+
+        // Buscar el usuario por email
+        $user = Usuario::where('email', $request->email)->first();
+
+        // Verificar si el usuario existe y la contraseña es correcta
+        if ($user && Hash::check($request->contrasena, $user->contrasena)) {
+
+            $data = [
+                "message"   => "Las credenciales Coinciden Correctamente!",
+                "usuario"   => $user,
+                "status"    => 200,
+            ];
+            return response()->json($data, 200);
+
+        } else {
+            $data = [
+                "message"   => "El usuario no existe o las credenciales son incorrectas :(",
+                "status"    => 401,
+            ];
+            return response()->json($data, 401);
+        }
     }
 }

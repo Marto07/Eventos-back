@@ -1,16 +1,11 @@
 <?php
 
-use App\Http\Controllers\HomeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-
-// Route::apiResource('usuarios', UsuarioController::class);
-
-// Route::get('test', function () {
-//     return response()->json(['message' => 'Ruta cargada correctamente']);
-// });
-Route::get('/home',[ HomeController::class, 'index']);
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
 
 Route::prefix('usuarios')->group(function () {
 
@@ -25,6 +20,8 @@ Route::prefix('usuarios')->group(function () {
     Route::patch('/{id}',    [\App\Http\Controllers\UsuarioController::class, "partialUpdate"]);
     
     Route::delete('/{id}', [\App\Http\Controllers\UsuarioController::class, "destroy"]);
+
+    Route::post('/login', [\App\Http\Controllers\UsuarioController::class, "authenticate"]);
     
 });
 
@@ -107,4 +104,3 @@ Route::prefix('tipo-requisitos')->group(function () {
     Route::delete('/{id}', [\App\Http\Controllers\TipoRequisitoController::class, "destroy"]);
     
 });
-

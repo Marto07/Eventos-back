@@ -63,12 +63,14 @@ class EventoController extends Controller
             return response()->json($data,500);
         }
 
+        $evento = Evento::with(['usuario', 'ticket'])->find($evento->id);
+
         $data = [
             "evento" => $evento,
             "status"  => 201,
         ];
 
-        return response()->json($data, 201);
+        return response()->json($evento, 201);
     }
 
     /**
@@ -86,12 +88,14 @@ class EventoController extends Controller
             return response()->json($data, 404);
         }
 
+        $evento = Evento::with(['usuario', 'ticket', 'invitados'])->find($evento->id);
+
         $data = [
             "evento"   => $evento,
             "status"    => 200,
         ];
 
-        return response()->json($data,200);
+        return response()->json($evento,200);
     }
 
     /**
@@ -143,6 +147,8 @@ class EventoController extends Controller
         $evento->ticket_fk         = $request->ticket_fk;
 
         $evento->save();
+
+        $evento = Evento::with(['usuario', 'ticket'])->find($evento->id);
 
         $data = [
             "message"   => "evento actualizado",
@@ -247,6 +253,8 @@ class EventoController extends Controller
         }
 
         $evento->save();
+
+        $evento = Evento::with(['usuario', 'ticket'])->find($evento->id);
 
         $data = [
             "message"   => "Evento actualizado",

@@ -2,26 +2,25 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+use App\Http\Controllers\UsuarioController;
 
 Route::prefix('usuarios')->group(function () {
 
-    Route::get('/',         [\App\Http\Controllers\UsuarioController::class, 'index']);
+    Route::get('/',         [UsuarioController::class, 'index']);
     
-    Route::get('/{id}',    [\App\Http\Controllers\UsuarioController::class, 'show']);
+    Route::get('/{id}',    [UsuarioController::class, 'show']);
     
-    Route::post('/',        [\App\Http\Controllers\UsuarioController::class, "store"]);
+    Route::post('/',        [UsuarioController::class, "store"]);
     
-    Route::put('/{id}',    [\App\Http\Controllers\UsuarioController::class, "update"]);
+    Route::put('/{id}',    [UsuarioController::class, "update"]);
 
-    Route::patch('/{id}',    [\App\Http\Controllers\UsuarioController::class, "partialUpdate"]);
+    Route::patch('/{id}',    [UsuarioController::class, "partialUpdate"]);
     
-    Route::delete('/{id}', [\App\Http\Controllers\UsuarioController::class, "destroy"]);
+    Route::delete('/{id}', [UsuarioController::class, "destroy"]);
 
-    Route::post('/login', [\App\Http\Controllers\UsuarioController::class, "authenticate"]);
+    Route::post('/login', [UsuarioController::class, "authenticate"]);
+
+    Route::get('/{id}/mis-eventos', [UsuarioController::class, "getEvents"]);
     
 });
 

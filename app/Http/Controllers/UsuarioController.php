@@ -225,13 +225,43 @@ class UsuarioController extends Controller
     public function authenticate(Request $request)
     {
         // Validar los datos del formulario
-        $request->validate([
-            'email'     => 'required|email',
-            'contrasena'  => 'required|min:8|max:255'
+        $validator = Validator::make($request->all(), [
+            'email'         => 'required|email|max:50',
+            'contrasena'    => 'required|min:8|max:50'
         ]);
+
+        if ($validator->fails()) {
+            $data = [
+                "message"   => "Error en la validacion de los datos",
+                "errors"    => $validator->errors(),
+                "status"    => 400,
+            ];
+
+            return response()->json($data, 400);
+        }
 
         // Buscar el usuario por email
         $user = Usuario::where('email', $request->email)->first();
+
+        if (!$user) {
+            $data = [
+                "message"   => "El usuario no existe o las credenciales son incorrectas :(",
+                "status"    => 401,
+            ];
+            return response()->json($data, 401);
+        }
+
+        // Comprobar si la contraseña almacenada NO está hasheada
+        if (!str_starts_with($user->contrasena, '$2y$')) {
+            return response()->json([
+                "message" => "Error: La contraseña no está protegida. Contacta al administrador",
+                "status"  => 400,
+            ], 400);
+        }
+
+        if (!Hash::check($request->contrasena, $user->contrasena)) {
+            return response()->json(["message" => "Credenciales incorrectas"], 401);
+        }
 
         // Verificar si el usuario existe y la contraseña es correcta
         if ($user && Hash::check($request->contrasena, $user->contrasena)) {
@@ -243,12 +273,28 @@ class UsuarioController extends Controller
             ];
             return response()->json($data, 200);
 
-        } else {
-            $data = [
-                "message"   => "El usuario no existe o las credenciales son incorrectas :(",
-                "status"    => 401,
-            ];
-            return response()->json($data, 401);
         }
+
+    }
+
+    public function getEvents($id) {
+
+        $user = Usuario::with(['eventos'])->find($id);
+
+        if (!$user) {
+            $data = [
+                "message" => "El usuario no existe o no fue encontrado",
+                "parametro de busqueda:" => $id,
+            ];
+
+            return response()->json($data, 400);
+        }
+
+        $data = [
+            "usuario" => $user,
+        ];
+
+        return response()->json($data, 200);
+
     }
 }

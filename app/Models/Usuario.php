@@ -14,6 +14,6 @@ class Usuario extends Model
 
     //Relacion de 1 a muchos eventos
     public function eventos() {
-        return $this->hasMany(Evento::class, 'usuario_id');
+        return $this->hasMany(Evento::class, 'usuario_fk');
     }
 }

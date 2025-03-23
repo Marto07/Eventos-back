@@ -6,6 +6,7 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UsuarioController extends Controller
 {
@@ -265,10 +266,11 @@ class UsuarioController extends Controller
 
         // Verificar si el usuario existe y la contraseña es correcta
         if ($user && Hash::check($request->contrasena, $user->contrasena)) {
+            session(["user" => $user]);
 
             $data = [
                 "message"   => "Las credenciales Coinciden Correctamente!",
-                "usuario"   => $user,
+                "user"   => $user,
                 "status"    => 200,
             ];
             return response()->json($data, 200);
